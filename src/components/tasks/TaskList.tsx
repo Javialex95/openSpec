@@ -2,11 +2,17 @@ import type { Task } from "@/src/types/task";
 
 type TaskListProps = {
   tasks: Task[];
+  onToggle: (id: string) => void;
+  emptyMessage: string;
 };
 
-export default function TaskList({ tasks }: TaskListProps) {
+export default function TaskList({
+  tasks,
+  onToggle,
+  emptyMessage,
+}: TaskListProps) {
   if (tasks.length === 0) {
-    return <p className="text-zinc-500">No tasks yet.</p>;
+    return <p className="text-zinc-500">{emptyMessage}</p>;
   }
 
   return (
@@ -16,7 +22,16 @@ export default function TaskList({ tasks }: TaskListProps) {
           key={task.id}
           className="rounded border border-zinc-200 px-3 py-2 dark:border-zinc-800"
         >
-          {task.title}
+          <label className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              checked={task.completed}
+              onChange={() => onToggle(task.id)}
+            />
+            <span className={task.completed ? "line-through" : undefined}>
+              {task.title}
+            </span>
+          </label>
         </li>
       ))}
     </ul>

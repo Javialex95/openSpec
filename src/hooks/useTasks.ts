@@ -3,7 +3,9 @@ import type { Task } from "@/src/types/task";
 
 const STORAGE_KEY = "tasks";
 
-function isTask(value: unknown): value is Task {
+type StoredTask = Omit<Task, "completed"> & { completed?: unknown };
+
+function isStoredTask(value: unknown): value is StoredTask {
   if (typeof value !== "object" || value === null) return false;
   const candidate = value as Record<string, unknown>;
   return (
@@ -18,8 +20,9 @@ function readTasks(): Task[] {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw === null) return [];
     const parsed: unknown = JSON.parse(raw);
-    if (!Array.isArray(parsed) || !parsed.every(isTask)) return [];
-    return parsed;
+    if (!Array.isArray(parsed) || !parsed.every(isStoredTask)) return [];
+    // Tasks saved before completion existed have no `completed` field.
+    return parsed.map((item) => ({ ...item, completed: item.completed === true }));
   } catch {
     return [];
   }
@@ -59,9 +62,22 @@ export function useTasks() {
     if (trimmed === "") return;
     setTasks((current) => [
       ...current,
-      { id: crypto.randomUUID(), title: trimmed, createdAt: Date.now() },
+      {
+        id: crypto.randomUUID(),
+        title: trimmed,
+        createdAt: Date.now(),
+        completed: false,
+      },
     ]);
   }, []);
 
-  return { tasks, loaded, addTask };
+  const toggleTask = useCallback((id: string) => {
+    setTasks((current) =>
+      current.map((task) =>
+        task.id === id ? { ...task, completed: !task.completed } : task,
+      ),
+    );
+  }, []);
+
+  return { tasks, loaded, addTask, toggleTask };
 }
