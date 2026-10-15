@@ -1,0 +1,20 @@
+schema: spec-driven
+
+context: |
+  Project: openspec-demo, a simple task manager to learn OpenSpec.
+  Stack: Next.js (App Router), React, TypeScript (strict), Tailwind CSS.
+  Data: in-memory or localStorage for now. No database, no auth.
+  Conventions:
+    - Server Components by default; use "use client" only when needed.
+  - Group components by feature: src/components/<feature>/ (e.g. src/components/tasks/).
+  - One component per file, PascalCase.
+    - Types in src/types. No `any`.
+  Scope: keep features small and focused. This is a learning project.
+
+rules:
+  proposal:
+    - Keep the proposal under one page.
+    - Include a short "Out of scope" section.
+  tasks:
+    - Each task should be small enough to review in a few minutes.
+    - End with a task to manually test the feature in the browser.
